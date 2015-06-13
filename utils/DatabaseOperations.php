@@ -11,7 +11,7 @@ class DatabaseOperations {
 
     public function __construct($host, $user, $password)
     {
-        $this->connection = $this->open_db_connection($host, $user, $password);
+        $this->connection = $this->openConnection($host, $user, $password);
     }
 
     /**
@@ -22,7 +22,7 @@ class DatabaseOperations {
      * @param $password
      * @return \Mysqli
      */
-    private function open_db_connection($host, $user, $password)
+    private function openConnection($host, $user, $password)
     {
         // Create connection
         $conn = new \Mysqli($host, $user, $password);
@@ -38,7 +38,7 @@ class DatabaseOperations {
      *
      * @param $db_clone_name
      */
-    public function drop_clone_database($db_clone_name)
+    public function dropCloneDatabase($db_clone_name)
     {
         $resource = $this->getConnection();
 
@@ -63,7 +63,7 @@ class DatabaseOperations {
      * @param $db_clone_name
      * @throws \Exception
      */
-    public function clone_db($db_name, $db_clone_name)
+    public function cloneDb($db_name, $db_clone_name)
     {
         $error = true;
 
@@ -98,8 +98,9 @@ class DatabaseOperations {
      *
      * @param $db_clone_name
      * @param $wp_clone_directory
+     * @throws \Exception
      */
-    public function update_db($db_clone_name, $wp_clone_directory)
+    public function updateRecords($db_clone_name, $wp_clone_directory)
     {
         $resource = $this->getConnection();
 
@@ -110,10 +111,15 @@ class DatabaseOperations {
         $sql_query2 = "UPDATE wp_options SET option_value = CONCAT(option_value, '/$wp_clone_directory') WHERE option_name = 'home'";
 
         $resource->query($sql_query1);
+        if($resource->errno)
+            throw new \Exception($resource->error);
+
         $resource->query($sql_query2);
+        if($resource->errno)
+            throw new \Exception($resource->error);
     }
 
-    public function close_db_connection()
+    public function closeConnection()
     {
         $resource = $this->getConnection();
         $resource->close();

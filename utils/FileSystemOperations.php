@@ -16,10 +16,10 @@ class FileSystemOperations {
      * @see http://codex.wordpress.org/Hardening_WordPress#File_permissions
      *
      * @param $wp_clone_directory_path
+     * @return array
      */
-    public function fix_wp_file_permissions($wp_clone_directory_path)
+    public function fixWpFilePermissions($wp_clone_directory_path)
     {
-
         #File Permissions
         $wp_owner = posix_getpwuid(fileowner($this->wp_config_file));
         $wp_group = posix_getgrgid(filegroup($this->wp_config_file));
@@ -45,6 +45,8 @@ class FileSystemOperations {
         ";
 
         exec($commands, $output);
+
+        return $output;
     }
 
     public function removeDirectories(array $directories)
@@ -65,9 +67,11 @@ class FileSystemOperations {
         }
     }
 
-    public function rename($source, $destination)
+    public function renameFile($source, $destination)
     {
-        rename($source, $destination);
+        $result = rename($source, $destination);
+        if($result === false)
+            throw new \Exception("Failed to rename $source to $destination!");
     }
 
     /**
@@ -76,13 +80,16 @@ class FileSystemOperations {
      * @param $db_name
      * @param $db_clone_name
      * @param $wp_clone_directory_path
+     * @throws \Exception
      */
     public function updateWpConfig($db_name, $db_clone_name, $wp_clone_directory_path)
     {
         $wp_config = $wp_clone_directory_path . 'wp-config.php';
         $file_contents = file_get_contents($wp_config);
         $file_contents = str_replace("define('DB_NAME', '$db_name');", "define('DB_NAME', '$db_clone_name');",$file_contents);
-        file_put_contents($wp_config, $file_contents);
+        $result = file_put_contents($wp_config, $file_contents);
+        if($result === false)
+            throw new \Exception("Failed to update wp-config.php!");
     }
 
     public function getLastDirectoryName($path)

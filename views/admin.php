@@ -1,34 +1,13 @@
 <?php
 
-error_reporting(E_ALL);
-ini_set('display_errors', '1');
-
+#error_reporting(E_ALL);
+#ini_set('display_errors', '1');
 
 require_once __DIR__ . '/../utils/Archive.php';
 require_once __DIR__ . '/../utils/DatabaseOperations.php';
 require_once __DIR__ . '/../utils/FileSystemOperations.php';
 require_once __DIR__ . '/../utils/Timer.php';
 require_once __DIR__ . '/../utils/WpClone.php';
-
-if(isset($_POST['isSubmitted']) && !empty($_POST['CloneFolder']))
-{
-    $tmp_wp_clone_directory = substr($_POST['CloneFolder'], -1) == '/' ? $_POST['CloneFolder'] : $_POST['CloneFolder'] . '/';
-    $wp_directory = get_home_path();
-    $wp_clone_directory = get_home_path() . $tmp_wp_clone_directory;
-
-    try {
-        $app = new Utils\WpClone($wp_directory, $wp_clone_directory);
-        $app->run();
-
-        echo "<pre>";
-        print_r($app->messages);
-        echo "</pre>";
-    }
-    catch(Exception $e)
-    {
-        echo $e->getMessage();
-    }
-}
 ?>
 
 <div class="wrap">
@@ -48,6 +27,29 @@ if(isset($_POST['isSubmitted']) && !empty($_POST['CloneFolder']))
     </div>
 </form>
 
+<?php
+if(isset($_POST['isSubmitted']) && !empty($_POST['CloneFolder']))
+{
+    $tmp_wp_clone_directory = substr($_POST['CloneFolder'], -1) == '/' ? $_POST['CloneFolder'] : $_POST['CloneFolder'] . '/';
+    $wp_directory = get_home_path();
+    $wp_clone_directory = get_home_path() . $tmp_wp_clone_directory;
+
+    try {
+        $app = new Utils\WpClone($wp_directory, $wp_clone_directory);
+        $app->run();
+
+        echo "<h2>Log</h2>";
+        echo "<ul>";
+            foreach($app->messages as $message){
+                echo "<li>$message</li>";
+            }
+        echo "</ul>";
+    }
+    catch(Exception $e)
+    {
+        echo $e->getMessage();
+    }
+}
 
 
 

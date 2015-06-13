@@ -52,15 +52,15 @@ class WpClone
             $this->messages[] = "Archive extracted ($archive_name, $this->wp_directory)";
 
             #Rename the clone directory
-            $fileSystemOperations->rename($this->wp_directory . $wp_directory_name, $this->wp_clone_directory);
+            $fileSystemOperations->renameFile($this->wp_directory . $wp_directory_name, $this->wp_clone_directory);
             $this->messages[] ="Rename clone directory ($this->wp_directory$wp_directory_name, $this->wp_clone_directory)";
 
             #Clone wp db
-            $dbOperations->clone_db($db_name, $db_clone_name);
+            $dbOperations->cloneDb($db_name, $db_clone_name);
             $this->messages[] = "DB cloning completed ($db_name, $db_clone_name)";
 
             #Update db urls
-            $dbOperations->update_db($db_clone_name, $wp_clone_directory_name);
+            $dbOperations->updateRecords($db_clone_name, $wp_clone_directory_name);
             $this->messages[] = "DB updated ($db_clone_name, $wp_clone_directory_name)";
 
             #Update wp-config.php to point to new db
@@ -69,8 +69,8 @@ class WpClone
 
             #Set wp directories proper permissions
 
-            $fileSystemOperations->fix_wp_file_permissions($this->wp_clone_directory);
-            $this->messages[] = "Fixed Files and Folders permissions ($this->wp_clone_directory)";
+            $fileOutput = $fileSystemOperations->fixWpFilePermissions($this->wp_clone_directory);
+            $this->messages[] = "Fixed Files and Folders permissions ($this->wp_clone_directory) Output: " . json_encode($fileOutput);
 
             #Disable crawlers to index the clone site
 
@@ -90,7 +90,7 @@ class WpClone
                 $this->wp_clone_directory
             ));
 
-            $dbOperations->drop_clone_database($db_clone_name);
+            $dbOperations->dropCloneDatabase($db_clone_name);
 
             throw new \Exception("An error occurred, rolled back all changes! " . $e->getMessage());
         }
@@ -99,6 +99,6 @@ class WpClone
         $fileSystemOperations->removeFiles(array($archive_name));
 
         #Close db connection
-        $dbOperations->close_db_connection();
+        $dbOperations->closeConnection();
     }
 }
