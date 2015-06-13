@@ -22,7 +22,7 @@ require_once __DIR__ . '/../utils/WpClone.php';
             <div style="float:left"><input type="text" name="CloneFolder" value="" style="width: 200px" /></div>
         </div>
         <div style="clear: left; text-align: right; padding-top: 10px">
-            <input type="submit" name="Submit" value="Save" class="button button-primary button-large" />
+            <input type="submit" name="Submit" value="Proceed" class="button button-primary button-large" />
         </div>
     </div>
 </form>
